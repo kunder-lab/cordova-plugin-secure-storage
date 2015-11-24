@@ -7,11 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.ConfigXmlParser;
+import org.apache.cordova.CordovaActivity;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
-import org.json.JSONObject;
-import javax.crypto.Cipher;
 
 public class SecureStorage extends CordovaPlugin {
     private static final String TAG = "SecureStorage";
@@ -29,7 +29,7 @@ public class SecureStorage extends CordovaPlugin {
                     initContextRunning = true;
                     try {
                         if (!RSA.isEntryAvailable(ALIAS)) {
-                            RSA.createKeyPair(getContext(), ALIAS);
+                            RSA.createKeyPair(getContext(), ALIAS, shouldUseEncriptedStorage());
                         }
                         initContext.success();
                     } catch (Exception e) {
@@ -48,6 +48,7 @@ public class SecureStorage extends CordovaPlugin {
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if ("init".equals(action)) {
             ALIAS = getContext().getPackageName() + "." + args.getString(0);
+
             if (!RSA.isEntryAvailable(ALIAS)) {
                 initContext = callbackContext;
                 unlockCredentials();
@@ -90,12 +91,14 @@ public class SecureStorage extends CordovaPlugin {
     }
 
     private void unlockCredentials() {
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                Intent intent = new Intent("com.android.credentials.UNLOCK");
-                startActivity(intent);
-            }
-        });
+        if(shouldUseEncriptedStorage()) {
+            cordova.getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    Intent intent = new Intent("com.android.credentials.UNLOCK");
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     private Context getContext(){
@@ -104,5 +107,12 @@ public class SecureStorage extends CordovaPlugin {
 
     private void startActivity(Intent intent){
         cordova.getActivity().startActivity(intent);
+    }
+
+    private boolean shouldUseEncriptedStorage() {
+        ConfigXmlParser parser = new ConfigXmlParser();
+        parser.parse((CordovaActivity)cordova.getActivity());
+        preferences = parser.getPreferences();
+        return preferences.getBoolean("shouldUseEncriptedStorage", true);
     }
 }
