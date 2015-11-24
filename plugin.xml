@@ -22,6 +22,9 @@
     <js-module src="www/sjcl_ss.js" name="sjcl_ss">
         <runs/>
     </js-module>
+    <js-module src="www/es6-promise.js" name="es6-promise">
+        <runs/>
+    </js-module>
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
