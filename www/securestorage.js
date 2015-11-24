@@ -1,5 +1,5 @@
 var sjcl_ss = cordova.require('cordova-plugin-secure-storage.sjcl_ss');
-var Promise = cordova.require('cordova-plugin-secure-storage.es6-promise').Promise;
+var ESP6Promise = cordova.require('cordova-plugin-secure-storage.es6-promise').Promise;
 var _AES_PARAM = {
     ks: 256,
     ts: 128,
@@ -32,7 +32,7 @@ SecureStorageiOS.prototype = {
 
     get: function (success, error, key) {
         var self = this;
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             cordova.exec(resolve, reject, "SecureStorage", "get", [self.service, key]);
         });
     
@@ -42,7 +42,7 @@ SecureStorageiOS.prototype = {
 
     set: function (success, error, key, value) {
         var self = this;
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             cordova.exec(resolve, reject, "SecureStorage", "set", [self.service, key, value]);
         });
     
@@ -52,7 +52,7 @@ SecureStorageiOS.prototype = {
 
     remove: function(success, error, key) {
         var self = this;
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             cordova.exec(resolve, reject, "SecureStorage", "remove", [self.service, key]);
         });
     
@@ -70,7 +70,7 @@ var SecureStorageAndroid = function (success, error, service) {
 SecureStorageAndroid.prototype = {
 
     get: function (success, error, key) {
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             var payload = localStorage.getItem('_SS_' + key);
             if (!payload) {
                 reject('Key "' + key + '"not found.');
@@ -101,7 +101,7 @@ SecureStorageAndroid.prototype = {
 
     set: function (success, error, key, value) {
         var self = this;
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             var AESKey = sjcl_ss.random.randomWords(8);
             _AES_PARAM.adata = self.service;
             value = sjcl_ss.encrypt(AESKey, value, _AES_PARAM);
@@ -123,7 +123,7 @@ SecureStorageAndroid.prototype = {
     },
 
     remove: function(success, error, key) {
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             localStorage.removeItem('_SS_' + key);
             resolve(key);
         });
@@ -143,7 +143,7 @@ var SecureStorageBrowser = function (success, error, service) {
 SecureStorageBrowser.prototype = {
 
     get: function (success, error, key) {
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             var value = localStorage.getItem('_SS_' + key);
             if (!value) {
                 reject('Key "' + key + '"not found.');
@@ -157,7 +157,7 @@ SecureStorageBrowser.prototype = {
     },
 
     set: function (success, error, key, value) {
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             localStorage.setItem('_SS_' + key, value);
             resolve(key);
         });
@@ -167,7 +167,7 @@ SecureStorageBrowser.prototype = {
     },
 
     remove: function(success, error, key) {
-        var promise = new Promise(function(resolve, reject) {
+        var promise = new ESP6Promise(function(resolve, reject) {
             localStorage.removeItem('_SS_' + key);
             resolve(key);
         });
