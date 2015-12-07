@@ -103,10 +103,11 @@ SecureStorageiOS.prototype = {
     }
 };
 
-var SecureStorageAndroid = function (success, error, service) {
+var SecureStorageAndroid = function (success, error, service, encryptionKey) {
     var _success = function(){};
-    var _error = function(){};
+    var _error = function(error){};
     var _service = service;
+	var _encryptionKey = encryptionKey;
 
     if('function' === typeof success) {
         _success = success;
@@ -120,51 +121,31 @@ var SecureStorageAndroid = function (success, error, service) {
     }
 
     this.service = _service;
-    cordova.exec(_success, _error, "SecureStorage", "init", [_service]);
+	this.encryptionKey = _encryptionKey;
+    cordova.exec(_success, _error, "SecureStorage", "init", [this.service, this.encryptionKey]);
     return this;
 };
 
 SecureStorageAndroid.prototype = {
-
     get: function (success, error, key) {
+        var self = this;
         var _key = key;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
+        var _success = success;
+        var _error = error;
 
         if('string' === typeof success) {
             _key = success;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
-        var promise = new ESP6Promise(function(resolve, reject) {
-            var payload = localStorage.getItem('_SS_' + _key);
-            if (!payload) {
-                reject('Key "' + _key + '"not found.');
-                return;
-            }
-            try {
-                payload = JSON.parse(payload);
-                var AESKey = payload.key;
-                cordova.exec(
-                    function (AESKey) {
-                        try {
-                            AESKey = sjcl_ss.codec.base64.toBits(AESKey);
-                            var value = sjcl_ss.decrypt(AESKey, payload.value);
-                            resolve(value);
-                        } 
-                        catch (e) {
-                            reject(e);
-                        }
-                    },
-                    reject, "SecureStorage", "decrypt", [AESKey]);
-            } 
-            catch (e) {
-                reject(e);
-            }
+        var promise = new ESP6Promise(function(_success, _error) {
+            cordova.exec(_success, _error, "SecureStorage", "get", [_key]);
         });
         
-        if(_hasCalllbacks) {
-            promise.then(success, error);
-        }
+        if(_hasCallbacks) {
+            promise.then(_success, _error);
+        }    
         return promise;
     },
 
@@ -172,53 +153,44 @@ SecureStorageAndroid.prototype = {
         var self = this;
         var _key = key;
         var _value = value;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
+        var _success = success;
+        var _error = error;
 
         if('string' === typeof success && 'function' !== typeof error && 'undefined' !== typeof error && !!error) {
             _key = success;
             _value = error;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
-        var promise = new ESP6Promise(function(resolve, reject) {
-            var AESKey = sjcl_ss.random.randomWords(8);
-            _AES_PARAM.adata = self.service;
-            _value = sjcl_ss.encrypt(AESKey, _value, _AES_PARAM);
-
-            // Ecrypt the AES key
-            cordova.exec(
-                function (encKey) {
-                    localStorage.setItem('_SS_' + _key, JSON.stringify({_key: encKey, value: _value}));
-                    resolve(_key);
-                },
-                function (err) {
-                    reject(err);
-                },
-                "SecureStorage", "encrypt", [sjcl_ss.codec.base64.fromBits(AESKey)]);
+        var promise = new ESP6Promise(function(_success, _error) {
+            cordova.exec(_success, _error, "SecureStorage", "set", [_key, _value]);
         });
-
-        if(_hasCalllbacks) {
-            promise.then(success, error);
-        }
+    
+        if(_hasCallbacks) {
+            promise.then(_success, _error);
+        }  
         return promise;
     },
 
     remove: function(success, error, key) {
+        var self = this;
         var _key = key;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
+        var _success = success;
+        var _error = error;
 
         if('string' === typeof success) {
             _key = success;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
-        var promise = new ESP6Promise(function(resolve, reject) {
-            localStorage.removeItem('_SS_' + _key);
-            resolve(_key);
+        var promise = new ESP6Promise(function(_success, _error) {
+            cordova.exec(_success, _error, "SecureStorage", "remove", [_key]);
         });
-
-        if(_hasCalllbacks) {
-            promise.then(success, error);
+    
+        if(_hasCallbacks) {
+            promise.then(_success, _error);
         }
         return promise;
     }
@@ -245,11 +217,11 @@ SecureStorageBrowser.prototype = {
 
     get: function (success, error, key) {
         var _key = key;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
 
         if('string' === typeof success) {
             _key = success;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
         var promise = new ESP6Promise(function(resolve, reject) {
@@ -261,7 +233,7 @@ SecureStorageBrowser.prototype = {
             }
         });
         
-        if(_hasCalllbacks) {
+        if(_hasCallbacks) {
             promise.then(success, error);
         }
         return promise;
@@ -270,12 +242,12 @@ SecureStorageBrowser.prototype = {
     set: function (success, error, key, value) {
         var _key = key;
         var _value = value;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
 
         if('string' === typeof success && 'function' !== typeof error && 'undefined' !== typeof error && !!error) {
             _key = success;
             _value = error;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
         var promise = new ESP6Promise(function(resolve, reject) {
@@ -283,7 +255,7 @@ SecureStorageBrowser.prototype = {
             resolve(_key);
         });
 
-        if(_hasCalllbacks) {
+        if(_hasCallbacks) {
             promise.then(success, error);
         }
         return promise;
@@ -291,11 +263,11 @@ SecureStorageBrowser.prototype = {
 
     remove: function(success, error, key) {
         var _key = key;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
 
         if('string' === typeof success) {
             _key = success;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
         var promise = new ESP6Promise(function(resolve, reject) {
@@ -303,7 +275,7 @@ SecureStorageBrowser.prototype = {
             resolve(_key);
         });
         
-        if(_hasCalllbacks) {
+        if(_hasCallbacks) {
             promise.then(success, error);
         }
         return promise;
