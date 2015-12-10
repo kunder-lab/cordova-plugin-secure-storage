@@ -1,6 +1,6 @@
 package com.crypho.plugins;
 
-import android.util.Log;
+//import android.util.Log;
 import android.util.Base64;
 
 import android.content.Context;
@@ -36,7 +36,7 @@ public class SecureStorage extends CordovaPlugin {
                         preferences.put(key, value);
                         callbackContext.success();
                     } catch (Exception e) {
-                        Log.e(TAG, "Set Storage Element failed :", e);
+                        //Log.e(TAG, "Set Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }
@@ -52,7 +52,7 @@ public class SecureStorage extends CordovaPlugin {
                         String value = preferences.getString(key);
                         callbackContext.success(value);
                     } catch (Exception e) {
-                        Log.e(TAG, "Get Storage Element failed :", e);
+                        //Log.e(TAG, "Get Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }
@@ -68,7 +68,7 @@ public class SecureStorage extends CordovaPlugin {
                         preferences.put(key, "");
                         callbackContext.success();
                     } catch (Exception e) {
-                        Log.e(TAG, "Remove Storage Element failed :", e);
+                        //Log.e(TAG, "Remove Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }

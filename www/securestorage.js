@@ -43,18 +43,18 @@ SecureStorageiOS.prototype = {
     get: function (success, error, key) {
         var self = this;
         var _key = key;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
 
         if('string' === typeof success) {
             _key = success;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
         var promise = new ESP6Promise(function(resolve, reject) {
             cordova.exec(resolve, reject, "SecureStorage", "get", [self.service, _key]);
         });
         
-        if(_hasCalllbacks) {
+        if(_hasCallbacks) {
             promise.then(success, error);
         }    
         return promise;
@@ -64,19 +64,19 @@ SecureStorageiOS.prototype = {
         var self = this;
         var _key = key;
         var _value = value;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
 
         if('string' === typeof success && 'function' !== typeof error && 'undefined' !== typeof error && !!error) {
             _key = success;
             _value = error;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
         var promise = new ESP6Promise(function(resolve, reject) {
             cordova.exec(resolve, reject, "SecureStorage", "set", [self.service, _key, _value]);
         });
     
-        if(_hasCalllbacks) {
+        if(_hasCallbacks) {
             promise.then(success, error);
         }  
         return promise;
@@ -85,18 +85,18 @@ SecureStorageiOS.prototype = {
     remove: function(success, error, key) {
         var self = this;
         var _key = key;
-        var _hasCalllbacks = true;
+        var _hasCallbacks = true;
 
         if('string' === typeof success) {
             _key = success;
-            _hasCalllbacks = false;
+            _hasCallbacks = false;
         }
 
         var promise = new ESP6Promise(function(resolve, reject) {
             cordova.exec(resolve, reject, "SecureStorage", "remove", [self.service, _key]);
         });
     
-        if(_hasCalllbacks) {
+        if(_hasCallbacks) {
             promise.then(success, error);
         }
         return promise;
