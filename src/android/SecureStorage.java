@@ -1,6 +1,6 @@
 package com.crypho.plugins;
 
-import android.util.Log;
+//import android.util.Log;
 import android.util.Base64;
 
 import android.content.Context;
@@ -16,71 +16,59 @@ import org.json.JSONException;
 public class SecureStorage extends CordovaPlugin {
     private static final String TAG = "SecureStorage";
 
-    private String ALIAS;
-
-    private volatile CallbackContext initContext;
-    private volatile boolean initContextRunning = false;
-
-    @Override
-    public void onResume(boolean multitasking) {
-        if (initContext != null && !initContextRunning) {
-            cordova.getThreadPool().execute(new Runnable() {
-                public void run() {
-                    initContextRunning = true;
-                    try {
-                        if (!RSA.isEntryAvailable(ALIAS)) {
-                            RSA.createKeyPair(getContext(), ALIAS, shouldUseEncriptedStorage());
-                        }
-                        initContext.success();
-                    } catch (Exception e) {
-                        Log.e(TAG, "Init failed :", e);
-                        initContext.error(e.getMessage());
-                    } finally {
-                        initContext = null;
-                        initContextRunning = false;
-                    }
-                }
-            });
-        }
-    }
+    private String encryptionKey;
+    private String serviceName;
 
     @Override
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if ("init".equals(action)) {
-            ALIAS = getContext().getPackageName() + "." + args.getString(0);
-
-            if (!RSA.isEntryAvailable(ALIAS)) {
-                initContext = callbackContext;
-                unlockCredentials();
-            } else {
-                callbackContext.success();
-            }
+            serviceName = args.getString(0);
+            encryptionKey = args.getString(1);
             return true;
         }
-        if ("encrypt".equals(action)) {
-            final String encryptMe = args.getString(0);
+        if ("set".equals(action)) {
+            final String key = args.getString(0);
+            final String value = args.getString(1);
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        byte[] encrypted = RSA.encrypt(encryptMe.getBytes(), ALIAS);
-                        callbackContext.success(Base64.encodeToString(encrypted, Base64.DEFAULT));
+                        SecurePreferences preferences = new SecurePreferences(getContext(), serviceName, encryptionKey, true);
+                        preferences.put(key, value);
+                        callbackContext.success();
                     } catch (Exception e) {
-                        Log.e(TAG, "Encrypt failed :", e);
+                        //Log.e(TAG, "Set Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }
             });
             return true;
         }
-        if ("decrypt".equals(action)) {
-            final byte[] decryptMe = args.getArrayBuffer(0);// getArrayBuffer does base64 decoding
+        if ("get".equals(action)) {
+            final String key = args.getString(0);
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        byte[] decrypted = RSA.decrypt(decryptMe, ALIAS);
-                        callbackContext.success(new String (decrypted));
+                        SecurePreferences preferences = new SecurePreferences(getContext(), serviceName, encryptionKey, true);
+                        String value = preferences.getString(key);
+                        callbackContext.success(value);
                     } catch (Exception e) {
-                        Log.e(TAG, "Decrypt failed :", e);
+                        //Log.e(TAG, "Get Storage Element failed :", e);
+                        callbackContext.error(e.getMessage());
+                    }
+                }
+            });
+            return true;
+        }
+        if ("remove".equals(action)) {
+            final String key = args.getString(0);
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        SecurePreferences preferences = new SecurePreferences(getContext(), serviceName, encryptionKey, true);
+                        preferences.put(key, "");
+                        callbackContext.success();
+                    } catch (Exception e) {
+                        //Log.e(TAG, "Remove Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }
@@ -90,29 +78,7 @@ public class SecureStorage extends CordovaPlugin {
         return false;
     }
 
-    private void unlockCredentials() {
-        if(shouldUseEncriptedStorage()) {
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    Intent intent = new Intent("com.android.credentials.UNLOCK");
-                    startActivity(intent);
-                }
-            });
-        }
-    }
-
     private Context getContext(){
         return cordova.getActivity().getApplicationContext();
-    }
-
-    private void startActivity(Intent intent){
-        cordova.getActivity().startActivity(intent);
-    }
-
-    private boolean shouldUseEncriptedStorage() {
-        ConfigXmlParser parser = new ConfigXmlParser();
-        parser.parse((CordovaActivity)cordova.getActivity());
-        preferences = parser.getPreferences();
-        return preferences.getBoolean("shouldUseEncriptedStorage", true);
     }
 }
