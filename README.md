@@ -36,19 +36,28 @@ cordova plugin add https://github.com/crypho/cordova-plugin-secure-storage.git
 ####Create a namespaced storage.
 
 ```js
+// Using callbacks
 var ss = new cordova.plugins.SecureStorage(
     function () { console.log('Success')},
     function (error) { console.log('Error ' + error); },
     'my_app');
 
+// With no callbacks
+var ss = new SecureStorage('my_app');
 ```
 #### Set a key/value in the storage.
 
 ```js
+// Using callbacks
 ss.set(
     function (key) { console.log('Set ' + key); },
     function (error) { console.log('Error ' + error); },
     'mykey', 'myvalue');
+
+// Using promises
+ss.set('mykey', 'myvalue')
+.then(function () { console.log('Success')})
+.catch(function (error) { console.log('Error ' + error); });
 ```
 
 where ``key`` and ``value`` are both strings.
@@ -56,19 +65,31 @@ where ``key`` and ``value`` are both strings.
 #### Get a key's value from the storage.
 
 ```js
+// Using callbacks
 ss.get(
     function (value) { console.log('Success, got ' + value); },
     function (error) { console.log('Error ' + error); },
     'mykey');
+
+// Using promises
+ss.get('mykey')
+.then(function () { console.log('Success')})
+.catch(function (error) { console.log('Error ' + error); });
 ```
 
 #### Remove a key from the storage.
 
 ```js
+// Using callbacks
 ss.remove(
     function (key) { console.log('Removed ' + key); },
     function (error) { console.log('Error, ' + error); },
     'mykey');
+
+// Using promises
+ss.remove('mykey')
+.then(function () { console.log('Success')})
+.catch(function (error) { console.log('Error ' + error); });
 ```
 
 ##Platform details
@@ -106,8 +127,29 @@ On Android there does not exist an equivalent of the iOS KeyChain. The ``SecureS
 
 The inverse process is followed on ``get``. AES is provided by the [sjcl](https://github.com/bitwiseshiftleft/sjcl) library.
 
+##### Configuration
+Android will not allow the creation of cryptographic keys unless the user has enabled at least PIN locking on the device.
+If you want to skip this limitation, it's possible to store the keys not encripted by using this preference in your ``config.xml``:
+
+```xml
+    <preference name="shouldUseEncriptedStorage" value="false" />
+```
+WARNING: this will store the generated keys in a not so secure way.
+
+
 #### Browser
 The browser platform is supported as a mock only. Key/values are stored unencrypted in localStorage.
+
+## FAQ
+
+* I get the error ``cordova.plugins.SecureStorage is not a function``, what gives?
+
+    You can instantiate the plugin only after the ``deviceready`` event is fired. The plugin is not available before that. Also make sure you use the plugin after its success callback has fired.
+
+* Do my users really need to set a PIN code on their android devices to use the plugin?
+
+    Yes, sorry. Android will not allow the creation of cryptographic keys unless the user has enabled at least PIN locking on the device.
+
 
 ##<a name="license"></a> LICENSE
 

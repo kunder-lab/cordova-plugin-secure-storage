@@ -83,8 +83,16 @@
 
     if ([query deleteItem:&error]) {
         [self successWithMessage: key];
-    } else {
-        [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
+    } 
+    else {
+        //Se setea esto como excepcion ya que si no encuentra el registro implica que está eliminado
+        if([error code] == errSecItemNotFound){
+            [self successWithMessage:key];
+        }
+        else{
+            [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
+        }
+        
     }
 }
 
