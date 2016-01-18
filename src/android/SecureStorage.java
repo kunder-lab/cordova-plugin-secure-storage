@@ -21,19 +21,6 @@ public class SecureStorage extends CordovaPlugin {
 
     private SecurePreferences preferences;
 
-    /**
-    * Sets the context of the Command. This can then be used to do things like
-    * get file paths associated with the Activity.
-    *
-    * @param cordova
-    *            The context of the main Activity.
-    * @param webView
-    *            The CordovaWebView Cordova is running in.
-    */
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        super.initialize(cordova, webView);
-    }
-
     @Override
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if ("init".equals(action)) {
