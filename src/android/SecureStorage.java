@@ -19,11 +19,22 @@ public class SecureStorage extends CordovaPlugin {
     private String encryptionKey;
     private String serviceName;
 
+    private SecurePreferences preferences;
+
     @Override
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if ("init".equals(action)) {
-            serviceName = args.getString(0);
-            encryptionKey = args.getString(1);
+            try {
+                serviceName = args.getString(0);
+                encryptionKey = args.getString(1);
+
+                preferences = new SecurePreferences(getContext(), encryptionKey, serviceName);
+
+                callbackContext.success();
+            } catch (Exception e) {
+                callbackContext.error(e.getMessage());
+            }
+
             return true;
         }
         if ("set".equals(action)) {
@@ -32,11 +43,12 @@ public class SecureStorage extends CordovaPlugin {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        SecurePreferences preferences = new SecurePreferences(getContext(), serviceName, encryptionKey, true);
-                        preferences.put(key, value);
+                        SecurePreferences.Editor editor = preferences.edit();
+                        editor.putString(key, value);
+                        editor.commit();
+
                         callbackContext.success();
                     } catch (Exception e) {
-                        //Log.e(TAG, "Set Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }
@@ -48,11 +60,10 @@ public class SecureStorage extends CordovaPlugin {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        SecurePreferences preferences = new SecurePreferences(getContext(), serviceName, encryptionKey, true);
-                        String value = preferences.getString(key);
+                        String value = preferences.getString(key, "");
+
                         callbackContext.success(value);
                     } catch (Exception e) {
-                        //Log.e(TAG, "Get Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }
@@ -64,11 +75,12 @@ public class SecureStorage extends CordovaPlugin {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        SecurePreferences preferences = new SecurePreferences(getContext(), serviceName, encryptionKey, true);
-                        preferences.put(key, "");
+                        SecurePreferences.Editor editor = preferences.edit();
+                        editor.putString(key, "");
+                        editor.commit();
+
                         callbackContext.success();
                     } catch (Exception e) {
-                        //Log.e(TAG, "Remove Storage Element failed :", e);
                         callbackContext.error(e.getMessage());
                     }
                 }
