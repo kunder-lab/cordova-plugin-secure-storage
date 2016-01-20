@@ -62,7 +62,12 @@ public class SecureStorage extends CordovaPlugin {
                     try {
                         String value = preferences.getString(key, "");
 
-                        callbackContext.success(value);
+                        if("".equals(value)) {
+                            callbackContext.error("Not Found");
+                        }
+                        else{
+                            callbackContext.success(value);    
+                        }
                     } catch (Exception e) {
                         callbackContext.error(e.getMessage());
                     }
