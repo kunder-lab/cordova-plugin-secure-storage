@@ -978,7 +978,6 @@
         });
       }
     };
-    };
     function lib$es6$promise$polyfill$$polyfill() {
       var local;
 
