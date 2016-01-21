@@ -1,17 +1,14 @@
 package com.crypho.plugins;
 
-//import android.util.Log;
-import android.util.Base64;
-
 import android.content.Context;
-import android.content.Intent;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.ConfigXmlParser;
-import org.apache.cordova.CordovaActivity;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SecureStorage extends CordovaPlugin {
     private static final String TAG = "SecureStorage";
@@ -19,7 +16,7 @@ public class SecureStorage extends CordovaPlugin {
     private String encryptionKey;
     private String serviceName;
 
-    private SecurePreferences preferences;
+    private Map<String,SecurePreferences> storageList = new HashMap<String, SecurePreferences>();
 
     @Override
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
@@ -28,7 +25,7 @@ public class SecureStorage extends CordovaPlugin {
                 serviceName = args.getString(0);
                 encryptionKey = args.getString(1);
 
-                preferences = new SecurePreferences(getContext(), encryptionKey, serviceName);
+                storageList.put(serviceName, new SecurePreferences(getContext(), encryptionKey, serviceName));
 
                 callbackContext.success();
             } catch (Exception e) {
@@ -37,17 +34,24 @@ public class SecureStorage extends CordovaPlugin {
 
             return true;
         }
-        if ("set".equals(action)) {
-            final String key = args.getString(0);
-            final String value = args.getString(1);
+        else if ("set".equals(action)) {
+            final String service = args.getString(0);
+            final String key = args.getString(1);
+            final String value = args.getString(2);
+
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        SecurePreferences.Editor editor = preferences.edit();
-                        editor.putString(key, value);
-                        editor.commit();
+                        if(storageList.containsKey(service)) {
+                            SecurePreferences.Editor editor = storageList.get(service).edit();
+                            editor.putString(key, value);
+                            editor.commit();
 
-                        callbackContext.success();
+                            callbackContext.success();
+                        }
+                        else {
+                            callbackContext.error("Storage is not initialized");
+                        }
                     } catch (Exception e) {
                         callbackContext.error(e.getMessage());
                     }
@@ -55,13 +59,20 @@ public class SecureStorage extends CordovaPlugin {
             });
             return true;
         }
-        if ("get".equals(action)) {
-            final String key = args.getString(0);
+        else if ("get".equals(action)) {
+            final String service = args.getString(0);
+            final String key = args.getString(1);
+
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        String value = preferences.getString(key, "");
-                        callbackContext.success(value);    
+                        if(storageList.containsKey(service)) {
+                            String value = storageList.get(service).getString(key, "");
+                            callbackContext.success(value);
+                        }
+                        else {
+                            callbackContext.error("Storage is not initialized");
+                        }
                     } catch (Exception e) {
                         callbackContext.error(e.getMessage());
                     }
@@ -69,16 +80,23 @@ public class SecureStorage extends CordovaPlugin {
             });
             return true;
         }
-        if ("remove".equals(action)) {
-            final String key = args.getString(0);
+        else if ("remove".equals(action)) {
+            final String service = args.getString(0);
+            final String key = args.getString(1);
+
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        SecurePreferences.Editor editor = preferences.edit();
-                        editor.putString(key, "");
-                        editor.commit();
+                        if(storageList.containsKey(service)) {
+                            SecurePreferences.Editor editor = storageList.get(service).edit();
+                            editor.putString(key, "");
+                            editor.commit();
 
-                        callbackContext.success();
+                            callbackContext.success();
+                        }
+                        else {
+                            callbackContext.error("Storage is not initialized");
+                        }
                     } catch (Exception e) {
                         callbackContext.error(e.getMessage());
                     }
