@@ -543,6 +543,19 @@
     }
 
     var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
+
+    function lib$es6$promise$defer$$defer(label) {
+      var deferred = {};
+
+      deferred['promise'] = new lib$es6$promise$promise$$default(function(resolve, reject) {
+        deferred['resolve'] = resolve;
+        deferred['reject'] = reject;
+      }, label);
+
+      return deferred;
+    }
+    var lib$es6$promise$defer$$default = lib$es6$promise$defer$$defer;
+    
     /**
       Promise objects represent the eventual result of an asynchronous operation. The
       primary way of interacting with a promise is through its `then` method, which
