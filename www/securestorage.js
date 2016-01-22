@@ -140,7 +140,7 @@ SecureStorageAndroid.prototype = {
         }
 
         var promise = new ESP6Promise(function(_success, _error) {
-            cordova.exec(_success, _error, "SecureStorage", "get", [_key]);
+            cordova.exec(_success, _error, "SecureStorage", "get", [self.service, _key]);
         });
         
         if(_hasCallbacks) {
@@ -164,7 +164,7 @@ SecureStorageAndroid.prototype = {
         }
 
         var promise = new ESP6Promise(function(_success, _error) {
-            cordova.exec(_success, _error, "SecureStorage", "set", [_key, _value]);
+            cordova.exec(_success, _error, "SecureStorage", "set", [self.service, _key, _value]);
         });
     
         if(_hasCallbacks) {
@@ -186,7 +186,7 @@ SecureStorageAndroid.prototype = {
         }
 
         var promise = new ESP6Promise(function(_success, _error) {
-            cordova.exec(_success, _error, "SecureStorage", "remove", [_key]);
+            cordova.exec(_success, _error, "SecureStorage", "remove", [self.service, _key]);
         });
     
         if(_hasCallbacks) {

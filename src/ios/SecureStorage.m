@@ -24,7 +24,8 @@
     if ([query fetch:&error]) {
         [self successWithMessage: query.password];
     } else {
-        [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
+        [self successWithMessage: nil];
+        // [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
     }
 }
 
