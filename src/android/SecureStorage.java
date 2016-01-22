@@ -13,17 +13,14 @@ import java.util.Map;
 public class SecureStorage extends CordovaPlugin {
     private static final String TAG = "SecureStorage";
 
-    private String encryptionKey;
-    private String serviceName;
-
     private Map<String,SecurePreferences> storageList = new HashMap<String, SecurePreferences>();
 
     @Override
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if ("init".equals(action)) {
             try {
-                serviceName = args.getString(0);
-                encryptionKey = args.getString(1);
+                String serviceName = args.getString(0);
+                String encryptionKey = args.getString(1);
 
                 storageList.put(serviceName, new SecurePreferences(getContext(), encryptionKey, serviceName));
 
