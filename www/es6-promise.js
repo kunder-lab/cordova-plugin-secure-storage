@@ -685,6 +685,7 @@
     lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
     lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
     lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
+    lib$es6$promise$promise$$Promise.defer = lib$es6$promise$defer$$defer;
 
     lib$es6$promise$promise$$Promise.prototype = {
       constructor: lib$es6$promise$promise$$Promise,
