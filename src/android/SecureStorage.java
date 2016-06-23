@@ -36,7 +36,7 @@ public class SecureStorage extends CordovaPlugin {
             final String key = args.getString(1);
             final String value = args.getString(2);
 
-            cordova.getThreadPool().execute(new Runnable() {
+            cordova.getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     try {
                         if(storageList.containsKey(service)) {
@@ -60,7 +60,7 @@ public class SecureStorage extends CordovaPlugin {
             final String service = args.getString(0);
             final String key = args.getString(1);
 
-            cordova.getThreadPool().execute(new Runnable() {
+            cordova.getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     try {
                         if(storageList.containsKey(service)) {
@@ -81,7 +81,7 @@ public class SecureStorage extends CordovaPlugin {
             final String service = args.getString(0);
             final String key = args.getString(1);
 
-            cordova.getThreadPool().execute(new Runnable() {
+            cordova.getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     try {
                         if(storageList.containsKey(service)) {
