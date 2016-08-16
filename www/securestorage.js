@@ -31,12 +31,12 @@ SecureStorageiOS.prototype = {
 
             defer.resolve(value);
         };
-        var _error = function(error){
+        var _error = function(msg){
             if('function' === typeof error) {
-                error(error);
+                error(msg);
             }
 
-            defer.reject(error);
+            defer.reject(msg);
         };
 
         if('string' === typeof success) {
@@ -61,12 +61,12 @@ SecureStorageiOS.prototype = {
 
             defer.resolve(value);
         };
-        var _error = function(error){
+        var _error = function(msg){
             if(!!error && 'function' === typeof error) {
-                error(error);
+                error(msg);
             }
 
-            defer.reject(error);
+            defer.reject(msg);
         };
 
         if(!!success && 'string' === typeof success) {
@@ -93,12 +93,12 @@ SecureStorageiOS.prototype = {
 
             defer.resolve(value);
         };
-        var _error = function(error){
+        var _error = function(msg){
             if('function' === typeof error) {
-                error(error);
+                error(msg);
             }
 
-            defer.reject(error);
+            defer.reject(msg);
         };
 
         if('string' === typeof success) {
@@ -152,12 +152,12 @@ SecureStorageAndroid.prototype = {
 
             defer.resolve(value);
         };
-        var _error = function(error){
+        var _error = function(msg){
             if('function' === typeof error) {
-                error(error);
+                error(msg);
             }
 
-            defer.reject(error);
+            defer.reject(msg);
         };
 
         if('string' === typeof success) {
@@ -182,12 +182,12 @@ SecureStorageAndroid.prototype = {
 
             defer.resolve(value);
         };
-        var _error = function(error){
+        var _error = function(msg){
             if(!!error && 'function' === typeof error) {
-                error(error);
+                error(msg);
             }
 
-            defer.reject(error);
+            defer.reject(msg);
         };
 
         if(!!success && 'string' === typeof success) {
@@ -214,12 +214,12 @@ SecureStorageAndroid.prototype = {
 
             defer.resolve(value);
         };
-        var _error = function(error){
+        var _error = function(msg){
             if('function' === typeof error) {
-                error(error);
+                error(msg);
             }
 
-            defer.reject(error);
+            defer.reject(msg);
         };
 
         if('string' === typeof success) {
