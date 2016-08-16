@@ -10,7 +10,7 @@ var _rejectOnTimeout = function(callbackError) {
             });
         }
     }, SecureStorage.Timeout);
-}
+};
 
 var SecureStorageiOS = function (success, error, service) {
     var _success = function(){};
