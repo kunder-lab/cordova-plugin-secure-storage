@@ -2,7 +2,7 @@ var sjcl_ss = cordova.require('cordova-plugin-secure-storage.sjcl_ss');
 var ESP6Promise = cordova.require('cordova-plugin-secure-storage.es6-promise').Promise;
 
 var _rejectOnTimeout = function(callbackError) {
-    setTimeout(function() {
+    return setTimeout(function() {
         if('function' === typeof callbackError) {
             callbackError({
                 code: 'timeout',
@@ -35,10 +35,15 @@ SecureStorageiOS.prototype = {
         var self = this;
         var _key = key;
         var _resolved = false;
+        var _rejectTimeout = null;
 
         var _success = function(value){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof success) {
                     success(value);
@@ -50,6 +55,10 @@ SecureStorageiOS.prototype = {
         var _error = function(msg){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof error) {
                     error(msg);
@@ -65,7 +74,7 @@ SecureStorageiOS.prototype = {
 
         cordova.exec(_success, _error, "SecureStorage", "get", [self.service, _key]);
 
-        _rejectOnTimeout(_error);
+        _rejectTimeout = _rejectOnTimeout(_error);
 
         return defer.promise;
     },
@@ -76,10 +85,15 @@ SecureStorageiOS.prototype = {
         var _key = key;
         var _value = value;
         var _resolved = false;
+        var _rejectTimeout = null;
 
         var _success = function(value){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if(!!success && 'function' === typeof success) {
                     success(value);
@@ -92,6 +106,10 @@ SecureStorageiOS.prototype = {
         var _error = function(msg){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if(!!error && 'function' === typeof error) {
                     error(msg);
@@ -110,7 +128,7 @@ SecureStorageiOS.prototype = {
 
         cordova.exec(_success, _error, "SecureStorage", "set", [self.service, _key, _value]);
 
-        _rejectOnTimeout(_error);
+        _rejectTimeout = _rejectOnTimeout(_error);
 
         return defer.promise;
     },
@@ -120,10 +138,15 @@ SecureStorageiOS.prototype = {
         var self = this;
         var _key = key;
         var _resolved = false;
+        var _rejectTimeout = null;
 
         var _success = function(value){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof success) {
                     success(value);
@@ -135,6 +158,10 @@ SecureStorageiOS.prototype = {
         var _error = function(msg){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof error) {
                     error(msg);
@@ -150,7 +177,7 @@ SecureStorageiOS.prototype = {
 
         cordova.exec(_success, _error, "SecureStorage", "remove", [self.service, _key]);
 
-        _rejectOnTimeout(_error);
+        _rejectTimeout = _rejectOnTimeout(_error);
 
         return defer.promise;
     }
@@ -190,10 +217,15 @@ SecureStorageAndroid.prototype = {
         var self = this;
         var _key = key;
         var _resolved = false;
+        var _rejectTimeout = null;
 
         var _success = function(value){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof success) {
                     success(value);
@@ -206,6 +238,10 @@ SecureStorageAndroid.prototype = {
         var _error = function(msg){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof error) {
                     error(msg);
@@ -221,7 +257,7 @@ SecureStorageAndroid.prototype = {
 
         cordova.exec(_success, _error, "SecureStorage", "get", [self.service, _key]);
 
-        _rejectOnTimeout(_error);
+        _rejectTimeout = _rejectOnTimeout(_error);
 
         return defer.promise;
     },
@@ -232,10 +268,15 @@ SecureStorageAndroid.prototype = {
         var _key = key;
         var _value = value;
         var _resolved = false;
+        var _rejectTimeout = null;
 
         var _success = function(value){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if(!!success && 'function' === typeof success) {
                     success(value);
@@ -247,6 +288,10 @@ SecureStorageAndroid.prototype = {
         var _error = function(msg){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if(!!error && 'function' === typeof error) {
                     error(msg);
@@ -265,7 +310,7 @@ SecureStorageAndroid.prototype = {
 
         cordova.exec(_success, _error, "SecureStorage", "set", [self.service, _key, _value]);
 
-        _rejectOnTimeout(_error);
+        _rejectTimeout = _rejectOnTimeout(_error);
 
         return defer.promise;
     },
@@ -275,10 +320,15 @@ SecureStorageAndroid.prototype = {
         var self = this;
         var _key = key;
         var _resolved = false;
+        var _rejectTimeout = null;
 
         var _success = function(value){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof success) {
                     success(value);
@@ -290,6 +340,10 @@ SecureStorageAndroid.prototype = {
         var _error = function(msg){
             if(!_resolved) {
                 _resolved = true;
+
+                if(_rejectTimeout) {
+                    clearTimeout(_rejectTimeout);
+                }
 
                 if('function' === typeof error) {
                     error(msg);
@@ -305,7 +359,7 @@ SecureStorageAndroid.prototype = {
 
         cordova.exec(_success, _error, "SecureStorage", "remove", [self.service, _key]);
 
-        _rejectOnTimeout(_error);
+        _rejectTimeout = _rejectOnTimeout(_error);
 
         return defer.promise;
     }
