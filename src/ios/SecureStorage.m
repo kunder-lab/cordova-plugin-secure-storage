@@ -6,27 +6,27 @@
 
 @implementation SecureStorage
 
-@synthesize callbackId;
 @synthesize keychainAccesssibilityMapping;
 
 - (void)get:(CDVInvokedUrlCommand*)command
 {
     NSString *service = [command argumentAtIndex:0];
     NSString *key = [command argumentAtIndex:1];
-    NSError *error;
 
-    self.callbackId = command.callbackId;
+    [self.commandDelegate runInBackground:^{
+        NSError *error;
 
-    SSKeychainQuery *query = [[SSKeychainQuery alloc] init];
-    query.service = service;
-    query.account = key;
+        SSKeychainQuery *query = [[SSKeychainQuery alloc] init];
+        query.service = service;
+        query.account = key;
 
-    if ([query fetch:&error]) {
-        [self successWithMessage: query.password];
-    } else {
-        [self successWithMessage: nil];
-        // [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
-    }
+        if ([query fetch:&error]) {
+            [self successWithMessage: query.password : command.callbackId];
+        } else {
+            self successWithMessage: nil];
+            // [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
+        }
+    }];
 }
 
 - (void)set:(CDVInvokedUrlCommand*)command
@@ -34,97 +34,93 @@
     NSString *service = [command argumentAtIndex:0];
     NSString *key = [command argumentAtIndex:1];
     NSString *value = [command argumentAtIndex:2];
-    NSError *error;
+    [self.commandDelegate runInBackground:^{
+        NSError *error;
 
-    self.callbackId = command.callbackId;
+        if (self.keychainAccesssibilityMapping == nil) {
 
-    if (self.keychainAccesssibilityMapping == nil) {
+            if( [[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0 ){
+                  self.keychainAccesssibilityMapping = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                      (__bridge id)(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly), @"afterfirstunlockthisdeviceonly",
+                                                      (__bridge id)(kSecAttrAccessibleAfterFirstUnlock), @"afterfirstunlock",
+                                                      (__bridge id)(kSecAttrAccessibleWhenUnlocked), @"whenunlocked",
+                                                      (__bridge id)(kSecAttrAccessibleWhenUnlockedThisDeviceOnly), @"whenunlockedthisdeviceonly",
+                                                      (__bridge id)(kSecAttrAccessibleAlways), @"always",
+                                                      (__bridge id)(kSecAttrAccessibleAlwaysThisDeviceOnly), @"alwaysthisdeviceonly",
+                                                      (__bridge id)(kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly), @"whenpasscodesetthisdeviceonly",
+                                                      nil];
+            }
+            else{
+                  self.keychainAccesssibilityMapping = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                      (__bridge id)(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly), @"afterfirstunlockthisdeviceonly",
+                                                      (__bridge id)(kSecAttrAccessibleAfterFirstUnlock), @"afterfirstunlock",
+                                                      (__bridge id)(kSecAttrAccessibleWhenUnlocked), @"whenunlocked",
+                                                      (__bridge id)(kSecAttrAccessibleWhenUnlockedThisDeviceOnly), @"whenunlockedthisdeviceonly",
+                                                      (__bridge id)(kSecAttrAccessibleAlways), @"always",
+                                                      (__bridge id)(kSecAttrAccessibleAlwaysThisDeviceOnly), @"alwaysthisdeviceonly",
+                                                      nil];
+            }
+        }
 
-		if( [[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0 ){
-        	self.keychainAccesssibilityMapping = [NSDictionary dictionaryWithObjectsAndKeys:
-                                              (__bridge id)(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly), @"afterfirstunlockthisdeviceonly",
-                                              (__bridge id)(kSecAttrAccessibleAfterFirstUnlock), @"afterfirstunlock",
-                                              (__bridge id)(kSecAttrAccessibleWhenUnlocked), @"whenunlocked",
-                                              (__bridge id)(kSecAttrAccessibleWhenUnlockedThisDeviceOnly), @"whenunlockedthisdeviceonly",
-                                              (__bridge id)(kSecAttrAccessibleAlways), @"always",
-                                              (__bridge id)(kSecAttrAccessibleAlwaysThisDeviceOnly), @"alwaysthisdeviceonly",
-                                              (__bridge id)(kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly), @"whenpasscodesetthisdeviceonly",
-                                              nil];
-		}
-		else{
-        	self.keychainAccesssibilityMapping = [NSDictionary dictionaryWithObjectsAndKeys:
-                                              (__bridge id)(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly), @"afterfirstunlockthisdeviceonly",
-                                              (__bridge id)(kSecAttrAccessibleAfterFirstUnlock), @"afterfirstunlock",
-                                              (__bridge id)(kSecAttrAccessibleWhenUnlocked), @"whenunlocked",
-                                              (__bridge id)(kSecAttrAccessibleWhenUnlockedThisDeviceOnly), @"whenunlockedthisdeviceonly",
-                                              (__bridge id)(kSecAttrAccessibleAlways), @"always",
-                                              (__bridge id)(kSecAttrAccessibleAlwaysThisDeviceOnly), @"alwaysthisdeviceonly",
-                                              nil];
-		}
-    }
+        NSString* keychainAccessibility = [[self.commandDelegate.settings objectForKey:[@"KeychainAccessibility" lowercaseString]] lowercaseString];
 
-    NSString* keychainAccessibility = [[self.commandDelegate.settings objectForKey:[@"KeychainAccessibility" lowercaseString]] lowercaseString];
+        if ([self.keychainAccesssibilityMapping objectForKey:(keychainAccessibility)] != nil) {
+            CFTypeRef accessibility = (__bridge CFTypeRef)([self.keychainAccesssibilityMapping objectForKey:(keychainAccessibility)]);
+            [SSKeychain setAccessibilityType:accessibility];
+        }
 
-    if ([self.keychainAccesssibilityMapping objectForKey:(keychainAccessibility)] != nil) {
-        CFTypeRef accessibility = (__bridge CFTypeRef)([self.keychainAccesssibilityMapping objectForKey:(keychainAccessibility)]);
-        [SSKeychain setAccessibilityType:accessibility];
-    }
+        SSKeychainQuery *query = [[SSKeychainQuery alloc] init];
 
-    SSKeychainQuery *query = [[SSKeychainQuery alloc] init];
+        query.service = service;
+        query.account = key;
+        query.password = value;
 
-    query.service = service;
-    query.account = key;
-    query.password = value;
-
-    if ([query save:&error]) {
-        [self successWithMessage: key];
-    } else {
-        [self failWithMessage: @"Failure in SecureStorage.set()" withError: error];
-    }
+        if ([query save:&error]) {
+            [self successWithMessage: key : command.callbackId];
+        } else {
+            [self failWithMessage: @"Failure in SecureStorage.set()" : error : command.callbackId];
+        }
+    }];
 }
 
 - (void)remove:(CDVInvokedUrlCommand*)command
 {
     NSString *service = [command argumentAtIndex:0];
     NSString *key = [command argumentAtIndex:1];
-    NSError *error;
 
-    self.callbackId = command.callbackId;
+    [self.commandDelegate runInBackground:^{
+        NSError *error;
 
-    SSKeychainQuery *query = [[SSKeychainQuery alloc] init];
-    query.service = service;
-    query.account = key;
+        SSKeychainQuery *query = [[SSKeychainQuery alloc] init];
+        query.service = service;
+        query.account = key;
 
-    if ([query deleteItem:&error]) {
-        [self successWithMessage: key];
-    } 
-    else {
-        //Se setea esto como excepcion ya que si no encuentra el registro implica que está eliminado
-        if([error code] == errSecItemNotFound){
-            [self successWithMessage:key];
+        if ([query deleteItem:&error]) {
+            [self successWithMessage: key : command.callbackId];
+        } else {
+            //Se setea esto como excepcion ya que si no encuentra el registro implica que está eliminado
+            if([error code] == errSecItemNotFound){
+                [self successWithMessage:key];
+            }
+            else{
+                [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
+            }
         }
-        else{
-            [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
-        }
-        
-    }
+    }];
 }
 
--(void)successWithMessage:(NSString *)message
+-(void)successWithMessage:(NSString *)message : (NSString *)callbackId
 {
-    if (self.callbackId != nil)
-    {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
-        [self.commandDelegate sendPluginResult:commandResult callbackId:self.callbackId];
-    }
+        [self.commandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
--(void)failWithMessage:(NSString *)message withError:(NSError *)error
+-(void)failWithMessage:(NSString *)message : (NSError *)error : (NSString *)callbackId
 {
     NSString        *errorMessage = (error) ? [NSString stringWithFormat:@"%@ - %@", message, [error localizedDescription]] : message;
     CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
 
-    [self.commandDelegate sendPluginResult:commandResult callbackId:self.callbackId];
+    [self.commandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
 @end
