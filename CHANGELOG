@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.3.1 - 2016-08-17
+------------------
+- Fix iOS typos in SecureStorage.m file
+  [arturokunder]
+
 2.3.0 - 2016-08-17
 ------------------
 
