@@ -23,7 +23,7 @@
         if ([query fetch:&error]) {
             [self successWithMessage: query.password : command.callbackId];
         } else {
-            self successWithMessage: nil];
+            [self successWithMessage: nil : command.callbackId];
             // [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
         }
     }];
@@ -100,10 +100,10 @@
         } else {
             //Se setea esto como excepcion ya que si no encuentra el registro implica que está eliminado
             if([error code] == errSecItemNotFound){
-                [self successWithMessage:key];
+                [self successWithMessage:key : command.callbackId];
             }
             else{
-                [self failWithMessage: @"Failure in SecureStorage.get()" withError: error];
+                [self failWithMessage: @"Failure in SecureStorage.get()" : error : command.callbackId];
             }
         }
     }];
