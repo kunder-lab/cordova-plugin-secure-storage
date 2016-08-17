@@ -1,8 +1,15 @@
+Forked from [Crypho AS - Cordova plugin Secure Storage](https://github.com/Crypho/cordova-plugin-secure-storage).
+
 # SecureStorage plugin for iOS & Android
 
 ## Introduction
 
 This plugin is for use with [Cordova](http://incubator.apache.org/cordova/) and allows your application to securely store secrets on iOS & Android phones.
+
+### Supported platforms
+- Android
+- iOS
+- Browser (mock-only, key/values are stored unencrypted)
 
 ### Contents
 
@@ -22,13 +29,13 @@ The plugin can be installed via the Cordova command line interface:
 * Run the command:
 
 ```sh
-cordova plugin add cordova-plugin-secure-storage
+cordova plugin add https://github.com/kunder-lab/cordova-plugin-secure-storage
 ```
 
 or if you want to be running the development version,
 
 ```sh
-cordova plugin add https://github.com/crypho/cordova-plugin-secure-storage.git
+cordova plugin add https://github.com/kunder-lab/cordova-plugin-secure-storage.git
 ```
 
 ##<a name="plugin_api"></a> Plugin API
@@ -165,7 +172,7 @@ The browser platform is supported as a mock only. Key/values are stored unencryp
 
     The MIT License
 
-    Copyright (c) 2015 Crypho AS.
+    Copyright (c) 2016 kunder.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

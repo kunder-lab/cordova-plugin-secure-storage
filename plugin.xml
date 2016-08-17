@@ -2,10 +2,10 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-plugin-secure-storage"
-    version="2.2.3">
+    version="2.3.0">
 
     <name>SecureStorage</name>
-    <author>Crypho AS</author>
+    <author>kunder</author>
 
     <description>
         Secure, encrypted storage for cordova apps in iOS and Android.

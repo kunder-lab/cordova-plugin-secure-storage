@@ -1,9 +1,10 @@
 {
   "name": "cordova-plugin-secure-storage",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "description": "Secure storage plugin for iOS & Android",
-  "author": "Yiorgis Gozadinos <ggozad@crypho.com>",
+  "author": "kunder",
   "contributors": [
+    {"name": "Yiorgis Gozadinos", "email": "ggozad@crypho.com"},
     {"name": "Demetris Manikas", "email": "demetris.manikas@gmail.com"}
   ],
   "cordova": {
@@ -26,14 +27,14 @@
   "main": "www/securestorage.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/crypho/cordova-plugin-secure-storage.git"
+    "url": "git+https://github.com/kunder-lab/cordova-plugin-secure-storage.git"
   },
   "devDependencies": {
     "cordova-plugin-test-framework": ">=1.0.0"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/crypho/cordova-plugin-secure-storage/issues"
+    "url": "https://github.com/kunder-lab/cordova-plugin-secure-storage/issues"
   },
-  "homepage": "https://github.com/crypho/cordova-plugin-secure-storage#readme"
+  "homepage": "https://github.com/kunder-lab/cordova-plugin-secure-storage#readme"
 }

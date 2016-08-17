@@ -1,6 +1,18 @@
 Changelog
 =========
 
+2.3.0 - 2016-08-17
+------------------
+
+- Added timeout for requests for cases when the plugin does call success or error callback.
+  [arturokunder]
+
+- Fix for js callbacks. Error message parameter name was the same as the function.
+  [arturokunder]
+
+- Fix iOS callback id. The property was set on every call and didn't allow multiple calls at the same time.
+  [arturokunder]
+
 2.2.3 - 2016-05-18
 ------------------
 

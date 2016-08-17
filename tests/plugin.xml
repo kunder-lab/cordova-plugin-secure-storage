@@ -5,7 +5,7 @@
     version="0.0.1-dev">
 
     <name>SecureStorage Tests</name>
-    <author>Crypho AS</author>
+    <author>kunder</author>
 
     <description>
         Test for cordova-plugin-secure-storage
