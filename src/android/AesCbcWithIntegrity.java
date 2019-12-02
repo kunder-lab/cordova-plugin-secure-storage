@@ -636,7 +636,7 @@ public class AesCbcWithIntegrity {
 
         private static final int VERSION_CODE_JELLY_BEAN = 16;
         private static final int VERSION_CODE_JELLY_BEAN_MR2 = 18;
-        private static final byte[] BUILD_FINGERPRINT_AND_DEVICE_SERIAL = getBuildFingerprintAndDeviceSerial(classContext);
+        private static final byte[] BUILD_FINGERPRINT_AND_DEVICE_SERIAL = getBuildFingerprintAndDeviceSerial();
 
         /** Hidden constructor to prevent instantiation. */
         private PrngFixes() {
@@ -923,17 +923,17 @@ public class AesCbcWithIntegrity {
          *
          * @return serial number or {@code null} if not available.
          */
-        private static String getDeviceSerialNumber(Context context) {
+        private static String getDeviceSerialNumber() {
             // We're using the Reflection API because Build.SERIAL is only
             // available since API Level 9 (Gingerbread, Android 2.3).
             String deviceSerial = "";
             try {
                 if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+                    if (ContextCompat.checkSelfPermission(classContext, Manifest.permission.READ_PHONE_STATE)
                             == PackageManager.PERMISSION_GRANTED) {
                         deviceSerial = Build.getSerial();
                     } else {
-                        deviceSerial = Settings.Secure.getString(context.getContentResolver(),
+                        deviceSerial = Settings.Secure.getString(classContext.getContentResolver(),
                                 Settings.Secure.ANDROID_ID);
                     }
                 } else {
@@ -946,13 +946,13 @@ public class AesCbcWithIntegrity {
             return deviceSerial;
         }
 
-        private static byte[] getBuildFingerprintAndDeviceSerial(Context context) {
+        private static byte[] getBuildFingerprintAndDeviceSerial() {
             StringBuilder result = new StringBuilder();
             String fingerprint = Build.FINGERPRINT;
             if (fingerprint != null) {
                 result.append(fingerprint);
             }
-            String serial = getDeviceSerialNumber(context);
+            String serial = getDeviceSerialNumber();
             if (serial != null) {
                 result.append(serial);
             }
