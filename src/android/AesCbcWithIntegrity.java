@@ -24,39 +24,44 @@
 
 package com.crypho.plugins;
 
-        import java.io.ByteArrayOutputStream;
-        import java.io.DataInputStream;
-        import java.io.DataOutputStream;
-        import java.io.File;
-        import java.io.FileInputStream;
-        import java.io.FileOutputStream;
-        import java.io.IOException;
-        import java.io.OutputStream;
-        import java.io.UnsupportedEncodingException;
-        import java.security.GeneralSecurityException;
-        import java.security.InvalidKeyException;
-        import java.security.NoSuchAlgorithmException;
-        import java.security.Provider;
-        import java.security.SecureRandom;
-        import java.security.SecureRandomSpi;
-        import java.security.Security;
-        import java.security.spec.KeySpec;
-        import java.util.Arrays;
-        import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.SecureRandom;
+import java.security.SecureRandomSpi;
+import java.security.Security;
+import java.security.spec.KeySpec;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-        import javax.crypto.Cipher;
-        import javax.crypto.KeyGenerator;
-        import javax.crypto.Mac;
-        import javax.crypto.SecretKey;
-        import javax.crypto.SecretKeyFactory;
-        import javax.crypto.spec.IvParameterSpec;
-        import javax.crypto.spec.PBEKeySpec;
-        import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
-        import android.os.Build;
-        import android.os.Process;
-        import android.util.Base64;
-        import android.util.Log;
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Process;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
+import android.util.Base64;
+import android.util.Log;
 
 /**
  * Simple library for the "right" defaults for AES key generation, encryption,
@@ -84,6 +89,12 @@ public class AesCbcWithIntegrity {
 
     private static final String HMAC_ALGORITHM = "HmacSHA256";
     private static final int HMAC_KEY_LENGTH_BITS = 256;
+
+    private static Context classContext;
+
+    public static void setContext(Context context){
+        classContext = context;
+    }
 
     /**
      * Converts the given AES/HMAC keys into a base64 encoded string suitable for
@@ -915,11 +926,24 @@ public class AesCbcWithIntegrity {
         private static String getDeviceSerialNumber() {
             // We're using the Reflection API because Build.SERIAL is only
             // available since API Level 9 (Gingerbread, Android 2.3).
+            String deviceSerial = "";
             try {
-                return (String) Build.class.getField("SERIAL").get(null);
+                if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (ContextCompat.checkSelfPermission(classContext, Manifest.permission.READ_PHONE_STATE)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        deviceSerial = Build.getSerial();
+                    } else {
+                        deviceSerial = Settings.Secure.getString(classContext.getContentResolver(),
+                                Settings.Secure.ANDROID_ID);
+                    }
+                } else {
+                    deviceSerial = (String) Build.class.getField("SERIAL").get(null);
+                }
             } catch (Exception ignored) {
                 return null;
             }
+
+            return deviceSerial;
         }
 
         private static byte[] getBuildFingerprintAndDeviceSerial() {

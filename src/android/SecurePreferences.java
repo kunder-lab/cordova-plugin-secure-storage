@@ -15,12 +15,15 @@
  */
 package com.crypho.plugins;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -105,6 +108,7 @@ public class SecurePreferences implements SharedPreferences {
     }
 
     private SecurePreferences(Context context, final AesCbcWithIntegrity.SecretKeys secretKey, final String password, final String sharedPrefFilename) {
+        AesCbcWithIntegrity.setContext(context);
         if (sharedPreferences == null) {
             sharedPreferences = getSharedPreferenceFile(context, sharedPrefFilename);
         }
@@ -218,8 +222,18 @@ public class SecurePreferences implements SharedPreferences {
         // We're using the Reflection API because Build.SERIAL is only available
         // since API Level 9 (Gingerbread, Android 2.3).
         try {
-            String deviceSerial = (String) Build.class.getField("SERIAL").get(
-                    null);
+            String deviceSerial = "";
+            if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    deviceSerial = Build.getSerial();
+                } else {
+                    deviceSerial = Settings.Secure.getString(context.getContentResolver(),
+                            Settings.Secure.ANDROID_ID);
+                }
+            } else {
+                deviceSerial = (String) Build.class.getField("SERIAL").get(null);
+            }
             if (TextUtils.isEmpty(deviceSerial)) {
                 return Settings.Secure.getString(
                         context.getContentResolver(),
